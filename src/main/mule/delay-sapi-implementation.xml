@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:my-train-customer-sapi="http://www.mulesoft.org/schema/mule/my-train-customer-sapi"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/my-train-customer-sapi http://www.mulesoft.org/schema/mule/my-train-customer-sapi/current/mule-my-train-customer-sapi.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="9e6c09e5-2b59-4c4c-8fcd-2ea8094ec7a5" applicationName="train-delay-sapi" applicationVersion="1.0" environment="dev" />
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="312d0288-4a03-44b9-9c43-8fee320f744b" >
+		<db:my-sql-connection host="64.227.37.97" port="3306" user="njclabs" password="training" database="nrs"/>
+	</db:config>
+	<wsc:config name="Nationalrail_Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="016d6cfa-1ec7-46c7-a0c9-5f6c9959c435" >
+		<wsc:connection wsdlLocation="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01" service="ldb" port="LDBServiceSoap12" address="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb11.asmx">
+			<wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
+		</wsc:connection>
+	</wsc:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="26ba8e1f-5aca-41fe-82c7-82548457d7ef" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" connectionIdleTimeout="3000000"/>
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3fc72266-11e5-4716-904a-06e9bdb33686" basePath="/api/customers" >
+		<http:request-connection host="localhost" port="8081" connectionIdleTimeout="3000000"/>
+	</http:request-config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="db71a42d-11a2-4392-ac5c-e1b3c3398bf6" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="njclabs05@gmail.com" password="njc@123456789" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="f4318d70-f9e8-4a06-bf9f-41f68e3cdd72" >
+		<db:my-sql-connection host="64.227.37.97" port="3306" user="njclabs" password="training" database="nrs"/>
+	</db:config>
+	<flow name="delay-Flow" doc:id="5eb8d8be-04dc-4408-ac66-10f53f247274" >
+		<json-logger:logger doc:name="Logger" doc:id="f33f5291-1c2b-4f46-b53f-97f082a8c6a2" config-ref="JSON_Logger_Config" message="Flow Started"/>
+		<ee:transform doc:name="Transform Message" doc:id="8bd16570-ccbe-4b59-b9c9-9e702450dfb5" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="headerTokenVariable" ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2013-11-28/Token/types
+---
+headers:{
+	ns0#AccessToken: {
+		ns0#TokenValue: "be9a29d0-8ac8-4727-b096-6c0c06d8011e"
+		
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="56106d8a-e467-4941-b915-5b2e17a7f83b" config-ref="Database_Config">
+			<db:sql ><![CDATA[select s.subscription_id,s.from_station,s.to_station, c.customer_id,c.email_id ,s.advance_notify_time,s.status_type_id,
+DATE_FORMAT(convert_tz(current_time(),'+00:00','+01:00') ,'%H:%i%:%s'),
+DATE_FORMAT(convert_tz(Date_sub(s.from_time ,INTERVAL s.advance_notify_time minute),'+00:00','+01:00'),'%H:%i%:%s')
+ from xxtrain_subscription_details s,xxtrain_customer_details c where
+  c.customer_id = s.customer_id and
+(DATE_FORMAT(Date_sub(s.from_time ,INTERVAL s.advance_notify_time minute) ,'%H:%i%:%s') between
+  DATE_FORMAT(convert_tz(current_time(),'+00:00','+01:00') ,'%H:%i%:%s') and
+DATE_FORMAT( Date_Add(convert_tz(current_time(),'+00:00','+01:00') , INTERVAL 30 minute ),'%H:%i:%s'))
+]]></db:sql>
+		</db:select>
+		<foreach doc:name="For Each" doc:id="1e630db3-f6fe-4212-b2af-e194b0d414b5" >
+			<ee:transform doc:name="Transform Message" doc:id="01cd78f4-fa39-4d14-8128-6ea14efa8e20" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2017-10-01/ldb/
+---
+{
+	ns0#GetDepBoardWithDetailsRequest: {
+		ns0#numRows:100,
+		ns0#crs: payload.from_station default "",
+		ns0#filterCrs: payload.to_station,
+		ns0#filterType:"to",
+		ns0#timeOffset:60,
+		ns0#timeWindow:120
+		
+	}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="customerData" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"subscriptionId":payload.subscription_id,
+	"customerId":payload.customer_id,
+	"customerEmail":payload.email_id,
+	"fromStation":payload.from_station,
+	"toStation":payload.to_station,
+	"advanceNotifyTime":payload.advance_notify_time,
+	"customerId":payload.customer_id,
+	"statusTypeId":payload.status_type_id	
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<wsc:consume doc:name="Consume" doc:id="9e1bc5ce-a140-4736-a2b5-59b916a5e01e" config-ref="Nationalrail_Web_Service_Consumer_Config" operation="GetDepBoardWithDetails" >
+				<wsc:message >
+					<wsc:headers ><![CDATA[#[vars.headerTokenVariable]]]></wsc:headers>
+				</wsc:message>
+			</wsc:consume>
+			<ee:transform doc:name="Transform Message" doc:id="e7a4f9af-28c8-45bf-b721-710fdb120f9a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	trainServices:
+	payload.body.GetDepBoardWithDetailsResponse.GetStationBoardResult.trainServices.*service
+	 
+	 
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="services" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+GetStationBoardResult:
+       payload.body.GetDepBoardWithDetailsResponse.*GetStationBoardResult
+               map(payload01,index)->{
+               	LocationName:payload01.locationName,
+               	crs:payload01.crs,
+               	std:payload01.trainServices.service.std,
+               	etd:payload01.trainServices.service.etd      	
+}	
+		
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="INFO" doc:name="AfterConsumeLogger" doc:id="ab3f48bf-7a04-45b7-be1a-cfe65a448ce1" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="61939df3-3cce-463f-bbcb-35a974f0166d" name="delayCalculation"/>
+		</foreach>
+	</flow>
+	<flow name="delayCalculation" doc:id="266078fc-f09b-4a09-8752-7100e977a0c4" >
+		<json-logger:logger doc:name="Logger" doc:id="5c9e198b-9650-42a2-8d2d-3a56820380ee" config-ref="JSON_Logger_Config" message="FlowStarted"/>
+		<ee:transform doc:name="Transform Message" doc:id="f8d35160-ff3b-48fa-af83-a45f517e5dae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+	
+payload.trainServices map (item,index)->{
+	 
+	  "std": item.std,
+      "etd": item.etd,
+      "operator": item.operator,
+      "operatorCode": item.operatorCode,
+      "serviceType": item.serviceType,
+      "serviceId":item.serviceID
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="4c819520-8a0e-4bbe-86c4-eacf98f391bb" >
+			<choice doc:name="Choice" doc:id="f9e5c6f8-2b0f-49a5-8cdd-c0c3647b35f5" >
+				<when expression='#[payload.etd =="On time"]'>
+					<flow-ref doc:name="Flow Reference" doc:id="e67186a2-dfcc-4210-bb3f-f35d94b382c6" name="checkInsertIntoAlertTable"/>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="3ee62d6d-5b47-49ef-bd61-57f84630b72e" message="NO DELAY"/>
+				</otherwise>
+			</choice>
+		</foreach>
+	</flow>
+	<flow name="insertIntoAlertTable" doc:id="1e35f3e0-ec02-4b4d-ac7c-a1e52a3b9544" >
+		<ee:transform doc:name="Transform Message" doc:id="16ccbcc8-4b09-46f6-8970-fb3c3ea4d6ac" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{
+
+  "subscription_id" :vars.customerData.subscriptionId,
+  "email_id"  : vars.customerData.email_id,
+  "email_notify": "No",
+  "origin_location": vars.customerData.fromStation,
+  "destination_location":vars.customerData.toStation,
+  "service_type":payload.serviceType,
+  "service_id":payload.serviceId,
+  "delay_status": payload.etd,
+  "delay_time":12,
+  "train_delay_reason":payload.cancelReason,
+  "status_type_id":  vars.customerData.statusTypeId,
+  "creationDate?": "2021-09-03",
+  "createdBy?": "admin",           
+  "lastUpdatedDate?":"2021-09-03",
+  "lastUpdatedBy?":  "admin"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="3ca855d0-753b-4d4a-bddf-196efacfa673" config-ref="HTTP_Request_configuration" path="/2/subscriptions/2/alerts"/>
+		<ee:transform doc:name="Transform Message" doc:id="cf5d87b2-488e-4268-b040-0d3adc808349" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="checkInsertIntoAlertTable" doc:id="45f7e55d-bab3-40ba-91d0-09d58d424a45" >
+		<json-logger:logger doc:name="Logger" doc:id="35dba3f6-a8f3-41f3-afa3-adb8e9db87e1" config-ref="JSON_Logger_Config" message="Flowstarted"/>
+		<ee:transform doc:name="Transform Message" doc:id="b84e6427-d24e-4476-a31e-b1eb9bb9e412" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{
+
+  "subscription_id" :vars.customerData.subscriptionId,
+  "email_id"  : vars.customerData.customerEmail,
+  "email_notify": "No",
+  "origin_location": vars.customerData.fromStation,
+  "destination_location":vars.customerData.toStation,
+  "service_type":payload.serviceType,
+  "service_id":payload.serviceId,
+  "delay_status": payload.etd,
+  "delay_time":12,
+  "train_delay_reason":payload.cancelReason,
+  "status_type_id":  vars.customerData.statusTypeId,
+  "creationDate?": "2021-09-03",
+  "createdBy?": "admin",           
+  "lastUpdatedDate?":"2021-09-03",
+  "lastUpdatedBy?":  "admin"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:stored-procedure doc:name="Stored procedure" doc:id="92c4d03c-5733-4688-94e8-618d57664f29" config-ref="Database_Config1" target="alertpayload">
+			<db:sql ><![CDATA[{Call createAlertDetails (:subscriptionId,:emailId,:originLocation,:destinationLocation,:serviceType,:serviceId,:delayStatus,:delayTime,:trainDelayReason,:alertId)}
+
+]]></db:sql>
+			<db:parameter-types />
+			<db:input-parameters ><![CDATA[#[{
+	"subscriptionId":payload[0].subscription_id,
+	"emailId":payload[0].email_id,
+	"originLocation":payload[0].origin_location,
+	"destinationLocation":payload[0].destination_location,
+	"serviceType":payload[0].service_type,
+	"serviceId":payload[0].service_id,
+	"trainDelayReason":payload[0].train_delay_reason,
+	"delayStatus":payload[0].delay_status,
+	"delayTime":payload[0].delay_time
+	}]]]></db:input-parameters>
+			<db:output-parameters >
+				<db:output-parameter key="alertId" type="INTEGER" />
+			</db:output-parameters>
+		</db:stored-procedure>
+		<email:send doc:name="Send" doc:id="8524799e-b397-4bf5-bc55-a53396f692b0" config-ref="Email_SMTP" fromAddress="njclabs05@gmail.com" subject="AlertNotification">
+			<email:to-addresses >
+				<email:to-address value="#[payload[0].email_id]" />
+			</email:to-addresses>
+			<email:body contentType="text/plain" />
+		</email:send>
+		<db:update doc:name="Update" doc:id="bba57934-8530-4c29-b0fe-da8746290c23" config-ref="Database_Config1">
+			<db:sql ><![CDATA[UPDATE nrs.xxtrain_alert_details 
+SET email_notify ="Notified" WHERE alert_id=:alert_id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+"alert_id":vars.alertpayload.alertId
+
+}]]]></db:input-parameters>
+		</db:update>
+	</flow>
+</mule>

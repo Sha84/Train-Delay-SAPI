@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<flow name="get-train-delay-Flow" doc:id="0406ee4c-2c01-43c4-aefd-68d932815c52" >
+		<json-logger:logger doc:name="Logger" doc:id="bd27e33b-42fd-46f6-b0ac-5ed97da31898" config-ref="JSON_Logger_Config" message="Flow Started"/>
+		<db:select doc:name="Select" doc:id="c107660e-20c4-4900-9f6f-5ba5c30ef54e" config-ref="Database_Config">
+			<db:sql ><![CDATA[select s.subscription_id,s.from_station,s.to_station, c.customer_id,c.email_id ,s.advance_notify_time,s.status_type_id,
+DATE_FORMAT(convert_tz(current_time(),'+00:00','+01:00') ,'%H:%i%:%s'),
+DATE_FORMAT(convert_tz(Date_sub(s.from_time ,INTERVAL s.advance_notify_time minute),'+00:00','+01:00'),'%H:%i%:%s')
+ from xxtrain_subscription_details s,xxtrain_customer_details c where
+  c.customer_id = s.customer_id and
+(DATE_FORMAT(Date_sub(s.from_time ,INTERVAL s.advance_notify_time minute) ,'%H:%i%:%s') between
+  DATE_FORMAT(convert_tz(current_time(),'+00:00','+01:00') ,'%H:%i%:%s') and
+DATE_FORMAT( Date_Add(convert_tz(current_time(),'+00:00','+01:00') , INTERVAL 30 minute ),'%H:%i:%s'))
+]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="809e5d33-57d0-4cc0-803a-69f26365ba34" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<flow name="consumeSoapFlow" doc:id="6292023d-57a5-4090-b025-b2097c28fad8" >
+		<json-logger:logger doc:name="Logger" doc:id="c600f111-0615-412e-b262-88c2b9690ec1" config-ref="JSON_Logger_Config" message="Flow Started"/>
+		<ee:transform doc:name="Transform Message" doc:id="6a6a24a8-6f44-4fd3-ab3f-e1c548a9d8d7" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="headerTokenVariable" ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2013-11-28/Token/types
+---
+headers:{
+	ns0#AccessToken: {
+		ns0#TokenValue: "be9a29d0-8ac8-4727-b096-6c0c06d8011e"
+		
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="3c64ad4e-32f1-4758-821b-92b1b03f18eb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2017-10-01/ldb/
+---
+{
+	ns0#GetDepBoardWithDetailsRequest: {
+		ns0#numRows:100,
+		ns0#crs: payload.from_station default "",
+		ns0#filterCrs: payload.to_station,
+		ns0#filterType:"to",
+		ns0#timeOffset:60,
+		ns0#timeWindow:120
+		}
+		}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="CustomerData" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"subscriptionId":payload.subscription_id,
+	"customerId":payload.customer_id,
+	"customerEmail":payload.email_id,
+	"fromStation":payload.from_station,
+	"toStation":payload.to_station,
+	"advanceNotifyTime":payload.advance_notify_time,
+	"customerId":payload.customer_id,
+	"statusTypeId":payload.status_type_id	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="12f3ed09-ae6c-4b9c-97a6-8ceb648e40b7" config-ref="Nationalrail_Web_Service_Consumer_Config" operation="GetDepBoardWithDetails">
+			<wsc:message >
+				<wsc:headers ><![CDATA[#[vars.headerTokenVariable]]]></wsc:headers>
+			</wsc:message>
+		</wsc:consume>
+		<ee:transform doc:name="Transform Message" doc:id="e709a95f-d9cd-494c-8b5c-f8fd428d3682" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	trainServices:
+	payload.body.GetDepBoardWithDetailsResponse.GetStationBoardResult.trainServices.*service
+	 
+	 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="insetAlertTableAndemailFlow" doc:id="5f374f48-0f49-4021-a6f7-b34dd0dd0672" >
+		<json-logger:logger doc:name="Logger" doc:id="ae7d1a08-8e79-40f7-a336-68301c15f1af" config-ref="JSON_Logger_Config" message="EmailFlow Started"/>
+		<email:send doc:name="Send" doc:id="15c5c5a4-c151-4c6a-97c0-7776d6eb9926" config-ref="Email_SMTP" fromAddress="njclabs05@gmail.com">
+			<email:to-addresses >
+				<email:to-address value="#[payload[0].email_id]" />
+			</email:to-addresses>
+			<email:body contentType="text/html" />
+		</email:send>
+		<json-logger:logger doc:name="Logger" doc:id="65f31dcd-2937-41f2-8652-9de2ed4ea134" config-ref="JSON_Logger_Config" message="endOfEmailFlow"/>
+	</flow>
+</mule>

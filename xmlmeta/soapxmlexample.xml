@@ -1,0 +1,238 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <soap:Body>
+      <GetDepBoardWithDetailsResponse xmlns="http://thalesgroup.com/RTTI/2017-10-01/ldb/">
+         <GetStationBoardResult xmlns:lt="http://thalesgroup.com/RTTI/2012-01-13/ldb/types" xmlns:lt6="http://thalesgroup.com/RTTI/2017-02-02/ldb/types" xmlns:lt7="http://thalesgroup.com/RTTI/2017-10-01/ldb/types" xmlns:lt4="http://thalesgroup.com/RTTI/2015-11-27/ldb/types" xmlns:lt5="http://thalesgroup.com/RTTI/2016-02-16/ldb/types" xmlns:lt2="http://thalesgroup.com/RTTI/2014-02-20/ldb/types" xmlns:lt3="http://thalesgroup.com/RTTI/2015-05-14/ldb/types">
+            <lt4:generatedAt>2021-05-30T17:26:14.8842465+01:00</lt4:generatedAt>
+            <lt4:locationName>Bracknell</lt4:locationName>
+            <lt4:crs>BCE</lt4:crs>
+            <lt4:filterLocationName>Reading</lt4:filterLocationName>
+            <lt4:filtercrs>RDG</lt4:filtercrs>
+            <lt4:platformAvailable>true</lt4:platformAvailable>
+            <lt7:trainServices>
+               <lt7:service>
+                  <lt4:std>17:43</lt4:std>
+                  <lt4:etd>On time</lt4:etd>
+                  <lt4:platform>2</lt4:platform>
+                  <lt4:operator>South Western Railway</lt4:operator>
+                  <lt4:operatorCode>SW</lt4:operatorCode>
+                  <lt4:serviceType>train</lt4:serviceType>
+                  <lt4:serviceID>9GhUXh4H+/+WlJ/UIGBlng==</lt4:serviceID>
+                  <lt5:rsid>SW385100</lt5:rsid>
+                  <lt5:origin>
+                     <lt4:location>
+                        <lt4:locationName>London Waterloo</lt4:locationName>
+                        <lt4:crs>WAT</lt4:crs>
+                     </lt4:location>
+                  </lt5:origin>
+                  <lt5:destination>
+                     <lt4:location>
+                        <lt4:locationName>Reading</lt4:locationName>
+                        <lt4:crs>RDG</lt4:crs>
+                     </lt4:location>
+                  </lt5:destination>
+                  <lt7:subsequentCallingPoints>
+                     <lt7:callingPointList>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Wokingham</lt7:locationName>
+                           <lt7:crs>WKM</lt7:crs>
+                           <lt7:st>17:49</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh</lt7:locationName>
+                           <lt7:crs>WNS</lt7:crs>
+                           <lt7:st>17:53</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh Triangle</lt7:locationName>
+                           <lt7:crs>WTI</lt7:crs>
+                           <lt7:st>17:55</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Earley</lt7:locationName>
+                           <lt7:crs>EAR</lt7:crs>
+                           <lt7:st>17:57</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Reading</lt7:locationName>
+                           <lt7:crs>RDG</lt7:crs>
+                           <lt7:st>18:02</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                     </lt7:callingPointList>
+                  </lt7:subsequentCallingPoints>
+               </lt7:service>
+               <lt7:service>
+                  <lt4:std>18:13</lt4:std>
+                  <lt4:etd>On time</lt4:etd>
+                  <lt4:platform>2</lt4:platform>
+                  <lt4:operator>South Western Railway</lt4:operator>
+                  <lt4:operatorCode>SW</lt4:operatorCode>
+                  <lt4:serviceType>train</lt4:serviceType>
+                  <lt4:serviceID>eqin10UPh8Q/FiDNnid7tQ==</lt4:serviceID>
+                  <lt5:rsid>SW385300</lt5:rsid>
+                  <lt5:origin>
+                     <lt4:location>
+                        <lt4:locationName>London Waterloo</lt4:locationName>
+                        <lt4:crs>WAT</lt4:crs>
+                     </lt4:location>
+                  </lt5:origin>
+                  <lt5:destination>
+                     <lt4:location>
+                        <lt4:locationName>Reading</lt4:locationName>
+                        <lt4:crs>RDG</lt4:crs>
+                     </lt4:location>
+                  </lt5:destination>
+                  <lt7:subsequentCallingPoints>
+                     <lt7:callingPointList>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Wokingham</lt7:locationName>
+                           <lt7:crs>WKM</lt7:crs>
+                           <lt7:st>18:19</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh</lt7:locationName>
+                           <lt7:crs>WNS</lt7:crs>
+                           <lt7:st>18:23</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh Triangle</lt7:locationName>
+                           <lt7:crs>WTI</lt7:crs>
+                           <lt7:st>18:25</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Earley</lt7:locationName>
+                           <lt7:crs>EAR</lt7:crs>
+                           <lt7:st>18:27</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Reading</lt7:locationName>
+                           <lt7:crs>RDG</lt7:crs>
+                           <lt7:st>18:32</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                     </lt7:callingPointList>
+                  </lt7:subsequentCallingPoints>
+               </lt7:service>
+               <lt7:service>
+                  <lt4:std>18:43</lt4:std>
+                  <lt4:etd>On time</lt4:etd>
+                  <lt4:operator>South Western Railway</lt4:operator>
+                  <lt4:operatorCode>SW</lt4:operatorCode>
+                  <lt4:serviceType>train</lt4:serviceType>
+                  <lt4:serviceID>dji7qB+fdYrwLt+hR95UPw==</lt4:serviceID>
+                  <lt5:rsid>SW385500</lt5:rsid>
+                  <lt5:origin>
+                     <lt4:location>
+                        <lt4:locationName>London Waterloo</lt4:locationName>
+                        <lt4:crs>WAT</lt4:crs>
+                     </lt4:location>
+                  </lt5:origin>
+                  <lt5:destination>
+                     <lt4:location>
+                        <lt4:locationName>Reading</lt4:locationName>
+                        <lt4:crs>RDG</lt4:crs>
+                     </lt4:location>
+                  </lt5:destination>
+                  <lt7:subsequentCallingPoints>
+                     <lt7:callingPointList>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Wokingham</lt7:locationName>
+                           <lt7:crs>WKM</lt7:crs>
+                           <lt7:st>18:49</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh</lt7:locationName>
+                           <lt7:crs>WNS</lt7:crs>
+                           <lt7:st>18:53</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh Triangle</lt7:locationName>
+                           <lt7:crs>WTI</lt7:crs>
+                           <lt7:st>18:55</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Earley</lt7:locationName>
+                           <lt7:crs>EAR</lt7:crs>
+                           <lt7:st>18:57</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Reading</lt7:locationName>
+                           <lt7:crs>RDG</lt7:crs>
+                           <lt7:st>19:02</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                     </lt7:callingPointList>
+                  </lt7:subsequentCallingPoints>
+               </lt7:service>
+               <lt7:service>
+                  <lt4:std>19:13</lt4:std>
+                  <lt4:etd>On time</lt4:etd>
+                  <lt4:operator>South Western Railway</lt4:operator>
+                  <lt4:operatorCode>SW</lt4:operatorCode>
+                  <lt4:serviceType>train</lt4:serviceType>
+                  <lt4:serviceID>TpTHjqR0zCg0I1WdkfYCdg==</lt4:serviceID>
+                  <lt5:rsid>SW960100</lt5:rsid>
+                  <lt5:origin>
+                     <lt4:location>
+                        <lt4:locationName>London Waterloo</lt4:locationName>
+                        <lt4:crs>WAT</lt4:crs>
+                     </lt4:location>
+                  </lt5:origin>
+                  <lt5:destination>
+                     <lt4:location>
+                        <lt4:locationName>Reading</lt4:locationName>
+                        <lt4:crs>RDG</lt4:crs>
+                     </lt4:location>
+                  </lt5:destination>
+                  <lt7:subsequentCallingPoints>
+                     <lt7:callingPointList>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Wokingham</lt7:locationName>
+                           <lt7:crs>WKM</lt7:crs>
+                           <lt7:st>19:19</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh</lt7:locationName>
+                           <lt7:crs>WNS</lt7:crs>
+                           <lt7:st>19:23</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Winnersh Triangle</lt7:locationName>
+                           <lt7:crs>WTI</lt7:crs>
+                           <lt7:st>19:25</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Earley</lt7:locationName>
+                           <lt7:crs>EAR</lt7:crs>
+                           <lt7:st>19:27</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                        <lt7:callingPoint>
+                           <lt7:locationName>Reading</lt7:locationName>
+                           <lt7:crs>RDG</lt7:crs>
+                           <lt7:st>19:32</lt7:st>
+                           <lt7:et>On time</lt7:et>
+                        </lt7:callingPoint>
+                     </lt7:callingPointList>
+                  </lt7:subsequentCallingPoints>
+               </lt7:service>
+            </lt7:trainServices>
+         </GetStationBoardResult>
+      </GetDepBoardWithDetailsResponse>
+   </soap:Body>
+</soap:Envelope>

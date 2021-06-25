@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="NationalRailResponse-xml" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#1f45b18b-3df1-4f7e-8563-7c07f8086d28"/>
+  <types:enrichment select="#8bd16570-ccbe-4b59-b9c9-9e702450dfb5"/>
+  <types:enrichment select="#6a6a24a8-6f44-4fd3-ab3f-e1c548a9d8d7"/>
+  <types:enrichment select="#809e5d33-57d0-4cc0-803a-69f26365ba34"/>
+  <types:enrichment select="#3c64ad4e-32f1-4758-821b-92b1b03f18eb"/>
+</types:mule>
